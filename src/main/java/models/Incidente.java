@@ -47,33 +47,18 @@ public class Incidente implements Comparable<Incidente> {
         return registradoEn;
     }
 
-    public int getSizeAfectados(){
-        return servicios.size();
+    @Override
+    public int compareTo(Incidente otro) {
+        Comparator<Incidente> comparador = Comparator
+                .comparingInt(Incidente::getSeveridad)
+                .thenComparingInt(Incidente::getMinutosRestantes)
+                .thenComparing(Comparator.comparingInt((Incidente i) -> i.getServicios().size()).reversed())
+                .thenComparing(Comparator.comparingLong((Incidente i) -> i.getServicios().stream()
+                        .mapToLong(ServicioAfectado::usuariosAfectados).sum()).reversed())
+                .thenComparing(Incidente::getRegistradoEn)
+                .thenComparing(Incidente::getCodigo, String.CASE_INSENSITIVE_ORDER);
+        return comparador.compare(this, otro);
     }
-    
-    public int getUsuariosAfectados() {
-    int cont = 0;
-    for (int i = 0; i < getSizeAfectados(); i++) {
-        // Verifica que el método en la clase de 'servicios' se llame exactamente así:
-        cont += servicios.get(i).usuariosAfectados();
-
-    }
-    return cont;
-}
-
-@Override
-public int compareTo(Incidente otro) {
-    Comparator<Incidente> comparador = Comparator
-            .comparingInt(Incidente::getSeveridad)
-            .thenComparingInt(Incidente::getMinutosRestantes)
-            .thenComparing(Incidente::getSizeAfectados, Comparator.reverseOrder())
-            .thenComparing(Incidente::getUsuariosAfectados, Comparator.reverseOrder())
-            .thenComparing(Incidente::getRegistradoEn)
-            .thenComparing(Incidente::getCodigo, String.CASE_INSENSITIVE_ORDER);
-
-    return comparador.compare(this, otro);
-}
-
 
     @Override
     public String toString() {
